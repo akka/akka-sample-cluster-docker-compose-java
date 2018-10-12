@@ -1,12 +1,4 @@
-name := "clustering"
-
 organization := "com.mlh"
-
-version := "0.4"
-
-homepage := Some(url("https://github.com/mhamrah/clustering"))
-
-startYear := Some(2013)
 
 /* scala versions and options */
 scalaVersion := "2.12.5"
@@ -35,11 +27,13 @@ libraryDependencies ++= Seq (
 
 maintainer := "Michael Hamrah <m@hamrah.com>"
 
+version in Docker := "latest"
+
 dockerExposedPorts in Docker := Seq(1600)
 
-dockerEntrypoint in Docker := Seq("sh", "-c", "CLUSTER_IP=`/sbin/ifconfig eth0 | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1 }'` bin/clustering $*")
+dockerEntrypoint in Docker := Seq("sh", "-c", "bin/clustering $*")
 
-dockerRepository := Some("mhamrah")
+dockerRepository := Some("lightbend")
 
 dockerBaseImage := "java"
 enablePlugins(JavaAppPackaging)
