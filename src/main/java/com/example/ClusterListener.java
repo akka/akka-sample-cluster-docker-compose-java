@@ -6,6 +6,8 @@ import akka.cluster.ClusterEvent;
 import akka.event.Logging;
 import akka.event.LoggingAdapter;
 
+import static akka.cluster.ClusterEvent.initialStateAsEvents;
+
 public class ClusterListener extends AbstractActor {
 
   final LoggingAdapter log = Logging.getLogger(this);
@@ -14,7 +16,7 @@ public class ClusterListener extends AbstractActor {
   @Override
   public void preStart() throws Exception {
     log.debug("starting up cluster listener...");
-    cluster.subscribe(self(), ClusterEvent.ClusterDomainEvent.class);
+    cluster.subscribe(self(), initialStateAsEvents(), ClusterEvent.ClusterDomainEvent.class);
   }
 
   @Override
