@@ -6,8 +6,6 @@ sbt docker:publishLocal
 
 docker-compose up -d
 
-docker ps
-
 docker logs akka-sample-cluster-docker-compose-java_seed_1
 
 for i in {1..10}
