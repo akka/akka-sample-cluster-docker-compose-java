@@ -1,6 +1,7 @@
 version: '2'
 services:
   seed:
+    container_name: akka-sample-cluster-docker-compose-java_seed_1
     image: lightbend/akka-sample-cluster-docker-compose-java:latest
     ports:
       - '1600:1600'
