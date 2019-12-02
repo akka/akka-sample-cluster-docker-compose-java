@@ -1,7 +1,7 @@
 organization := "com.mlh"
 
 /* scala versions and options */
-scalaVersion := "2.12.5"
+scalaVersion := "2.13.1"
 
 // These options will be used for *all* versions.
 scalacOptions ++= Seq(
@@ -11,7 +11,7 @@ scalacOptions ++= Seq(
   "-Xlint",
 )
 
-val akka = "2.5.25"
+val akka = "2.6.0"
 
 /* dependencies */
 libraryDependencies ++= Seq (
