@@ -1,43 +1,42 @@
 package com.example;
 
-import akka.actor.AbstractActor;
-import akka.cluster.Cluster;
+import akka.actor.typed.Behavior;
+import akka.actor.typed.javadsl.AbstractBehavior;
+import akka.actor.typed.javadsl.ActorContext;
+import akka.actor.typed.javadsl.Behaviors;
+import akka.actor.typed.javadsl.Receive;
 import akka.cluster.ClusterEvent;
-import akka.event.Logging;
-import akka.event.LoggingAdapter;
+import akka.cluster.typed.Cluster;
+import akka.cluster.typed.Subscribe;
 
-import static akka.cluster.ClusterEvent.initialStateAsEvents;
+public final class ClusterListener extends AbstractBehavior<ClusterEvent.ClusterDomainEvent> {
 
-public class ClusterListener extends AbstractActor {
+  public static Behavior<ClusterEvent.ClusterDomainEvent> create() {
+    return Behaviors.setup(ClusterListener::new);
+  }
 
-  final LoggingAdapter log = Logging.getLogger(this);
-  final Cluster cluster = Cluster.get(context().system());
-
-  @Override
-  public void preStart() throws Exception {
-    log.debug("starting up cluster listener...");
-    cluster.subscribe(self(), initialStateAsEvents(), ClusterEvent.ClusterDomainEvent.class);
+  private ClusterListener(ActorContext<ClusterEvent.ClusterDomainEvent> context) {
+    super(context);
+    context.getLog().debug("starting up cluster listener...");
+    final Cluster cluster = Cluster.get(context.getSystem());
+    cluster.subscriptions().tell(Subscribe.create(context.getSelf(), ClusterEvent.ClusterDomainEvent.class));
   }
 
   @Override
-  public Receive createReceive() {
-    return receiveBuilder()
-        .match(ClusterEvent.CurrentClusterState.class, state -> {
-          log.debug("Current members: {}", state.members());
-        })
-        .match(ClusterEvent.MemberUp.class, event -> {
-          log.debug("Member is Up: {}", event.member().address());
-        })
-        .match(ClusterEvent.UnreachableMember.class, event -> {
-          log.debug("Member detected as unreachable: {}", event.member());
-
-        })
-        .match(ClusterEvent.MemberRemoved.class, event -> {
-          log.debug("Member is Removed: {} after {}", event.member().address(), event.previousStatus());
-        })
-        .match(ClusterEvent.MemberEvent.class, event -> {
-          log.info("Member Event: " + event.toString());
-        })
-        .build();
+  public Receive<ClusterEvent.ClusterDomainEvent> createReceive() {
+    return newReceiveBuilder()
+        .onMessage(ClusterEvent.MemberUp.class, event -> {
+          getContext().getLog().info("Member is Up: {}", event.member().address());
+          return this;
+        }).onMessage(ClusterEvent.UnreachableMember.class, event -> {
+          getContext().getLog().info("Member detected as unreachable: {}", event.member().address());
+          return this;
+        }).onMessage(ClusterEvent.MemberRemoved.class, event -> {
+          getContext().getLog().info("Member is Removed: {} after {}", event.member().address(), event.previousStatus());
+          return this;
+        }).onMessage(ClusterEvent.MemberRemoved.class, event -> {
+          getContext().getLog().info("Member Event: " + event.toString());
+          return this;
+        }).build();
   }
 }

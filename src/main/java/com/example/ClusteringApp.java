@@ -1,15 +1,16 @@
 package com.example;
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
+import akka.actor.typed.ActorSystem;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 
 public class ClusteringApp {
 
   public static void main(String[] args) {
-    ActorSystem system = ActorSystem.create(ClusteringConfig.CLUSTER_NAME);
+    Config config = ConfigFactory.load();
+    String clusterName = config.getString("clustering.cluster.name");
 
-    ActorRef clusterListener = system.actorOf(Props.create(ClusterListener.class), "clusterListener");
+    ActorSystem<?> system = ActorSystem.create(ClusterListener.create(), clusterName);
   }
 
 }
