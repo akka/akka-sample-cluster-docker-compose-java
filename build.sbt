@@ -13,6 +13,8 @@ scalacOptions ++= Seq(
 
 val akka = "2.6.11"
 
+resolvers += "Akka library repository".at("https://repo.akka.io/maven")
+
 /* dependencies */
 libraryDependencies ++= Seq (
   // -- Logging --
